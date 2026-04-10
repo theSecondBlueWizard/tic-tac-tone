@@ -1,6 +1,6 @@
 #include "game.hh"
 
-int main() {
+int mainNOT() {
     TicTacToe game;
 
     // std::cout << "Welcome to TicTacToe!" << "\n";
@@ -13,7 +13,7 @@ int main() {
             case Red:
                 // std::cout << "r";
                 break;
-            case Black:
+            case Yellow:
                 // std::cout << "b";
                 break;
             default:

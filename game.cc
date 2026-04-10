@@ -1,6 +1,6 @@
 #include "game.hh"
 
-void printLedArray(
+void TicTacToe::printLedArray(
   bool yellow[LED_MATRIX_Y][LED_MATRIX_X],
   bool red[LED_MATRIX_Y][LED_MATRIX_X]) {
 
@@ -41,51 +41,61 @@ void printLedArray(
   return;
 }
 
-void TicTacToe::printBoard() {
-
+void TicTacToe::updateBoard() {
     bool yellow[LED_MATRIX_Y][LED_MATRIX_X] = {0};
     bool red[LED_MATRIX_Y][LED_MATRIX_X] = {0};
-    
 
     for(int y = 0; y < 3; y++) {
         for(int x = 0; x < 3; x++) {
             Player cellOwner = board[y][x];
 
             switch (cellOwner) {
-                case Player::Black:
-                    yellow[y][x] = true;
+                case Player::Yellow:
+                    yellow[y][x + 3] = true;
                     break;
                 case Player::Red:
-                    red[y][x] = true;
+                    red[y][x + 3] = true;
                     break;
                 case Player::None:
                     break;
                 default:
-                    // Serial.println("[Game] Error: non-player object on board");
+                    Serial.println("[Game] Error: non-player object on board");
                     break;
             }
         }
     }
-
     printLedArray(yellow, red);
 }
 
+void TicTacToe::printBoard() {
+    for (int y = 0; y < 3; y++) {
+        for (int x = 0; x < 3; x++) {
+            Serial.print(board[y][x]);
+        }
+        Serial.println();
+    }
+}
+
 void TicTacToe::move(int x, int y, Player player) {
-    // if (finished == true) {
-    //     throw std::runtime_error("[TicTacToe] Game already finished!");
-    // }
+    if (finished == true) {
+        Serial.println("[TicTacToe] Error: game already finished!");
+        return;
+    }
     
-    // if (player != currentMove) {
-    //     throw std::invalid_argument("[TicTacToe] Wrong player move attempted");
-    // }
+    if (player != currentMove) {
+        Serial.println("[TicTacToe] Error: Wrong player move attempted");
+        return;
+    }
 
-    // if (board[y][x] != None) {
-    //     throw std::runtime_error("[TicTacToe] Illegal move");
-    // }
+    if (board[y][x] != None) {
+        Serial.println("[TicTacToe] Error: Illegal move");
+        return;
+    }
 
-    // if (winner != None) {
-    //     throw std::runtime_error("[TicTacToe] Player already won!");
-    // }
+    if (winner != None) {
+        Serial.println("[TicTacToe] Error:Player already won!");
+        return;
+    }
 
     Player newCellOwner;
 
@@ -93,26 +103,24 @@ void TicTacToe::move(int x, int y, Player player) {
         case Red:
             newCellOwner = Player::Red;
             break;
-        case Black:
-            newCellOwner = Player::Black;
+        case Yellow:
+            newCellOwner = Player::Yellow;
             break;
         default:
-            break;
-            // throw std::invalid_argument("[TicTacToe] Illegal player");
+            Serial.println("[TicTacToe] Error: Illegal player");
     };
 
     board[y][x] = newCellOwner;
     
     switch (currentMove) {
         case Red:
-            currentMove = Black;
+            currentMove = Yellow;
             break;
-        case Black:
+        case Yellow:
             currentMove = Red;
             break;
         default:
-            break;
-            // throw std::invalid_argument("[TicTacToe] Illegal state of currentMove");
+            Serial.println("[TicTacToe] Error: Illegal state of currentMove");
     }
     detectVictories();
 }

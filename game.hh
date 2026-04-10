@@ -5,7 +5,7 @@
 enum Player {
     None,
     Red,
-    Black
+    Yellow
 };
 
 class TicTacToe {
@@ -13,12 +13,16 @@ class TicTacToe {
         Player currentMove = Red;
 
         void printBoard();
+        void updateBoard();
         void move(int x, int y, Player player);
-
         Player winner = None;
         bool finished = false;
         
-        Player board[3][3];
     private:
+        Player board[3][3] = { 0 };
         void detectVictories();
+        void printLedArray(
+            bool yellow[LED_MATRIX_Y][LED_MATRIX_X],
+            bool red[LED_MATRIX_Y][LED_MATRIX_X]
+        );
 };
