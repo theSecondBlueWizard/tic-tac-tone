@@ -41,6 +41,43 @@ void TicTacToe::printLedArray(
   return;
 }
 
+bool emptyLedArray[3][6] = { 0 };
+bool crossLedArray[3][6] = {
+    { 0, 0, 0, 1, 0, 1 },
+    { 0, 0, 0, 0, 1, 0 },
+    { 0, 0, 0, 1, 0, 1 },
+};
+
+void TicTacToe::crashAndBurn() {
+    updateBoard();
+    switch (currentMove) {
+        case Yellow:
+            for (int i = 0; i < 3; i++) {
+                delay(200);
+                printLedArray(crossLedArray, emptyLedArray);
+                delay(200);
+                printLedArray(emptyLedArray, emptyLedArray);
+            }
+            break;
+        case Red:
+            for (int i = 0; i < 3; i++) {
+                delay(200);
+                printLedArray(emptyLedArray, crossLedArray);
+                delay(200);
+                printLedArray(emptyLedArray, emptyLedArray);
+            }
+            break;
+        default:
+            for (int i = 0; i < 3; i++) {
+                delay(500);
+                printLedArray(crossLedArray, emptyLedArray);
+                delay(500);
+                printLedArray(emptyLedArray, crossLedArray);
+            }
+    }
+    updateBoard();
+}
+
 void TicTacToe::updateBoard() {
     bool yellow[LED_MATRIX_Y][LED_MATRIX_X] = {0};
     bool red[LED_MATRIX_Y][LED_MATRIX_X] = {0};
@@ -60,8 +97,25 @@ void TicTacToe::updateBoard() {
                     break;
                 default:
                     Serial.println("[Game] Error: non-player object on board");
+                    crashAndBurn();
                     break;
             }
+        }
+    }
+    if (winner == Player::Yellow) {
+        for (int i = 0; i < 3; i++) {
+            printLedArray(yellow, red);
+            delay(500);
+            printLedArray(emptyLedArray, red);
+            delay(500);
+        }
+    }
+    else if (winner == Player::Red) {
+        for (int i = 0; i < 3; i++) {
+            printLedArray(yellow, red);
+            delay(500);
+            printLedArray(yellow, emptyLedArray);
+            delay(500);
         }
     }
     printLedArray(yellow, red);
@@ -79,21 +133,25 @@ void TicTacToe::printBoard() {
 void TicTacToe::move(int x, int y, Player player) {
     if (finished == true) {
         Serial.println("[TicTacToe] Error: game already finished!");
+        crashAndBurn();
         return;
     }
     
     if (player != currentMove) {
         Serial.println("[TicTacToe] Error: Wrong player move attempted");
+        crashAndBurn();
         return;
     }
 
     if (board[y][x] != None) {
         Serial.println("[TicTacToe] Error: Illegal move");
+        crashAndBurn();
         return;
     }
 
     if (winner != None) {
         Serial.println("[TicTacToe] Error:Player already won!");
+        crashAndBurn();
         return;
     }
 
@@ -122,7 +180,13 @@ void TicTacToe::move(int x, int y, Player player) {
         default:
             Serial.println("[TicTacToe] Error: Illegal state of currentMove");
     }
+
     detectVictories();
+    if (this->finished == true && winner == Player::None) {
+        Serial.println("[TicTacToe] Error: game is finished!");
+        crashAndBurn();
+        return;
+    }
 }
 
 void TicTacToe::detectVictories() {
@@ -137,12 +201,16 @@ void TicTacToe::detectVictories() {
     if (board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[1][1] != None){ this-> winner = board[1][1]; }
     if (board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[1][1] != None){ this-> winner = board[1][1]; }
     
-    finished = true;
+    this->finished = true;
     for (int y = 0; y < 3; y++) {
         for (int x = 0; x < 3; x++) {
-            if (board[y][x] != None) finished = false;
+            if (board[y][x] == Player::None) {this->finished = false; Serial.println("noone's won yet!");}
         }
     }
+    
+    if (this->finished == true) {
+        currentMove = None;
+    }
 
-    if (winner != None) finished = true;
+    if (winner != None) this->finished = true;
 }

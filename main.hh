@@ -1,8 +1,13 @@
+#pragma once
+
 #define latchPin 2  // RCLK
 #define serialPin 3 // SRCLK
 #define redLED 4    //
 #define yellowLED 5 //
 #define buttonPin 6 //
+#define yellowTurnPin 7 //
+#define redTurnPin 8 //
+
 
 #define boardLen 6
 #define N_SAMPLES 192
@@ -12,4 +17,5 @@
 
 #include <time.h>
 #include "game.hh"
+#include "mic.hh"
 #include "Arduino.h"
