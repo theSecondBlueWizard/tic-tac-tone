@@ -208,9 +208,7 @@ void TicTacToe::detectVictories() {
         }
     }
     
-    if (this->finished == true) {
-        currentMove = None;
-    }
+    if (this->finished == true) currentMove = None;
 
     if (winner != None) this->finished = true;
 }
